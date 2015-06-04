@@ -173,6 +173,7 @@
 				TargetAttributes = {
 					2FEA75D11A68DB88003B786D = {
 						CreatedOnToolsVersion = 6.1.1;
+						DevelopmentTeam = JEJU4Q6849;
 					};
 					2FEA75EA1A68DB89003B786D = {
 						CreatedOnToolsVersion = 6.1.1;
@@ -349,6 +350,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = LSButton/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -359,6 +361,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = LSButton/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -418,6 +421,7 @@
 				2FEA75F71A68DB89003B786D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2FEA75F81A68DB89003B786D /* Build configuration list for PBXNativeTarget "LSButtonTests" */ = {
 			isa = XCConfigurationList;
@@ -426,6 +430,7 @@
 				2FEA75FA1A68DB89003B786D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
