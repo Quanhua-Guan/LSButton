@@ -20,7 +20,7 @@
 {
     if (!buttonFromCode)
     {
-        buttonFromCode = [LSButton buttonWithFrame:CGRectOffset(button.frame, 0, -button.frame.size.height - 10) icon:button.currentImage buttonColor:[UIColor grayColor] shadowColor:[UIColor blackColor] tintColor:[UIColor whiteColor] radius:10 angel:45 target:nil action:nil];
+        buttonFromCode = [LSButton buttonWithFrame:CGRectOffset(button.frame, 0, -button.frame.size.height - 10) icon:[UIImage imageNamed:@"icon"] buttonColor:[UIColor grayColor] shadowColor:[UIColor blackColor] tintColor:[UIColor whiteColor] radius:10 angel:45 target:nil action:nil];
         [self.view addSubview:buttonFromCode];
     }
 }

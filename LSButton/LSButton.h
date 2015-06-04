@@ -12,9 +12,10 @@ IB_DESIGNABLE
 
 @property (nonatomic,strong) IBInspectable UIColor *buttonColor;
 @property (nonatomic,strong) IBInspectable UIColor *shadowColor;
+@property (nonatomic) IBInspectable CGFloat shadowXOffset;
+@property (nonatomic) IBInspectable CGFloat shadowYOffset;
 @property (nonatomic) IBInspectable CGFloat radius;
 @property (nonatomic) IBInspectable CGFloat angel;
-
 
 + (LSButton *)buttonWithFrame:(CGRect)frame
                          icon:(UIImage*)icon
