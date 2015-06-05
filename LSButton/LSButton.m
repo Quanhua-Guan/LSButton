@@ -147,7 +147,7 @@ static void getPoints(void* info, const CGPathElement* element)
         
         ////////get the cgpath of attributed title////////
         // for each RUN
-        CGMutablePathRef letters = CGPathCreateMutable();
+        CGMutablePathRef lettersPath = CGPathCreateMutable();
         for (CFIndex runIndex = 0; runIndex < CFArrayGetCount(runArray); runIndex++)
         {
             // Get FONT for this run
@@ -168,25 +168,27 @@ static void getPoints(void* info, const CGPathElement* element)
                 {
                     CGPathRef letter = CTFontCreatePathForGlyph(runFont, glyph, NULL);
                     CGAffineTransform t = CGAffineTransformMakeTranslation(position.x, position.y);
-                    CGPathAddPath(letters, &t, letter);
+                    CGPathAddPath(lettersPath, &t, letter);
                     CGPathRelease(letter);
                 }
             }
         }
         CFRelease(line);
+    
         ///////////////
         
         CGRect stringBoundingRect = [attrString boundingRectWithSize:rect.size
                                                              options:(NSStringDrawingUsesLineFragmentOrigin |  NSStringDrawingUsesFontLeading)
                                                              context:nil];// 宽度准确可用
-        CGRect pathBoundingBox = CGPathGetBoundingBox(letters);// 高度准确可用
+        CGRect pathBoundingBox = CGPathGetBoundingBox(lettersPath);// 高度准确可用
         CGRect stringRect = CGRectMake(0, 0, ceil(stringBoundingRect.size.width), ceil(pathBoundingBox.size.height));
         
         CGAffineTransform transform = CGAffineTransformIdentity;
         transform = CGAffineTransformTranslate(transform, self.titleLabel.center.x - (stringRect.size.width) / 2.0, self.titleLabel.center.y + stringRect.size.height / 2.0f);
         transform = CGAffineTransformScale(transform, 1.0, -1.0);
         transform = CGAffineTransformTranslate(transform, _shadowXOffset, -_shadowYOffset);
-        CGMutablePathRef stringPath = CGPathCreateMutableCopyByTransformingPath(letters, &transform);
+        CGMutablePathRef stringPath = CGPathCreateMutableCopyByTransformingPath(lettersPath, &transform);
+        CFRelease(lettersPath);
         
         CGContextAddPath(ctx, stringPath);
         CGContextFillPath(ctx);
@@ -194,7 +196,9 @@ static void getPoints(void* info, const CGPathElement* element)
         CGFloat l = MAX(rect.size.width, rect.size.height) * 4.0f;
         
         NSMutableArray *points = [NSMutableArray array];
-        CGPathApply(stringPath, (__bridge void *)(points), getPoints);
+        CGPathApply(stringPath, (void *)(points), getPoints);
+        
+        CFRelease(stringPath);
         
         CGPoint currentPoint;
         for (NSArray *pointInfo in points) {
@@ -224,6 +228,8 @@ static void getPoints(void* info, const CGPathElement* element)
                     CGContextAddPath(ctx, stringSubpath);
                     CGContextFillPath(ctx);
                     
+                    CFRelease(stringSubpath);
+                    
                     currentPoint = point1;
                 }
                     break;
@@ -244,6 +250,8 @@ static void getPoints(void* info, const CGPathElement* element)
                     CGPathCloseSubpath(stringSubpath);
                     CGContextAddPath(ctx, stringSubpath);
                     CGContextFillPath(ctx);
+                    
+                    CFRelease(stringSubpath);
                     
                     currentPoint = quadCurveEndPoint;
                 }
@@ -266,6 +274,8 @@ static void getPoints(void* info, const CGPathElement* element)
                     CGPathCloseSubpath(stringSubpath);
                     CGContextAddPath(ctx, stringSubpath);
                     CGContextFillPath(ctx);
+                    
+                    CFRelease(stringSubpath);
                     
                     currentPoint = curveEndPoint;
                 }
