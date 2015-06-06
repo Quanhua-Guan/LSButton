@@ -42,24 +42,29 @@ static void getPoints(void* info, const CGPathElement* element)
     [points addObject:pointInfoArrray];
 }
 
+@implementation LSButton {
+    UIColor *realBGColor;
+}
 
-@implementation LSButton
-
-+(LSButton *)buttonWithFrame:(CGRect)frame icon:(UIImage*)icon buttonColor:(UIColor *)buttonColor shadowColor:(UIColor *)shadowColor tintColor:(UIColor*)tintColor radius:(CGFloat)radius angel:(CGFloat)angel target:(id)tar action:(SEL)sel
++(LSButton *)buttonWithFrame:(CGRect)frame icon:(UIImage*)icon buttonColor:(UIColor *)buttonColor titleShadowColor:(UIColor *)titleShadowColor tintColor:(UIColor*)tintColor radius:(CGFloat)radius titleShadowAngel:(CGFloat)titleShadowAngel target:(id)tar action:(SEL)sel
 {
     LSButton *button = [LSButton new];
     button.frame = frame;
-    button.buttonColor = buttonColor;
-    button.shadowColor = shadowColor;
+    button.backgroundColor = buttonColor;
+    [button setTitleShadowColor:titleShadowColor forState:UIControlStateNormal];
     button.tintColor = tintColor;
-    button.radius = radius;
-    button.angel = angel;
+    button.layer.cornerRadius = radius;
+    button.titleShadowAngel = titleShadowAngel;
     [button setImage:icon forState:UIControlStateNormal];
     [button addTarget:tar action:sel forControlEvents:UIControlEventTouchUpInside];
     return button;
 }
 
-- (id)initWithFrame:(CGRect)frame
+- (instancetype)init {
+    return [self initWithFrame:CGRectZero];
+}
+
+- (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame])
         [self setup];
@@ -74,15 +79,45 @@ static void getPoints(void* info, const CGPathElement* element)
 
 -(void)setup
 {
-    if (!self.buttonColor) self.buttonColor = [UIColor colorWithRed:0.400 green:0.800 blue:1.000 alpha:1.000];
-    if (!self.shadowColor) self.shadowColor = [UIColor colorWithWhite:0.326 alpha:1.000];
-    if (!self.angel) self.angel = 45;
-    self.backgroundColor = [UIColor clearColor];
+    if (!self.titleShadowLength) {
+        _titleShadowLength = 100;
+    }
+    if (!self.titleShadowAngel) self.titleShadowAngel = 45;
 }
 
--(void)setRadius:(CGFloat)radius
-{
-    _radius = MIN(radius, self.frame.size.width / 2.0);
+- (UIColor *)backgroundColor {
+    return realBGColor;
+}
+
+- (void)setHighlighted:(BOOL)highlighted {
+    [super setHighlighted:highlighted];
+    [self setNeedsDisplay];
+}
+
+-(void)setBackgroundColor:(UIColor *)backgroundColor {
+    super.backgroundColor = [UIColor clearColor];
+    realBGColor = backgroundColor;
+    [self setNeedsDisplay];
+}
+
+- (void)setTitleShadowAngel:(CGFloat)titleShadowAngel {
+    _titleShadowAngel = titleShadowAngel;
+    [self setNeedsDisplay];
+}
+
+- (void)setTitleShadowLength:(CGFloat)titleShadowLength {
+    _titleShadowLength = titleShadowLength;
+    [self setNeedsDisplay];
+}
+
+- (void)setTitleColor:(UIColor *)color forState:(UIControlState)state {
+    [super setTitleColor:color forState:state];
+    [self setNeedsDisplay];
+}
+
+- (void)setTitleShadowColor:(UIColor *)color forState:(UIControlState)state {
+    [super setTitleShadowColor:color forState:state];
+    [self setNeedsDisplay];
 }
 
 -(void)layoutSubviews
@@ -94,56 +129,57 @@ static void getPoints(void* info, const CGPathElement* element)
 
 - (void)drawRect:(CGRect)rect
 {
+    [super drawRect:rect];
+    
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     CGContextSetAllowsAntialiasing(ctx, YES);
     
-    [self.buttonColor setFill];
-    UIBezierPath *p = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:self.radius];
+    // background color
+    [realBGColor set];
+    UIBezierPath *buttonBezierPath = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:self.layer.cornerRadius];
+    [buttonBezierPath fill];
+    [buttonBezierPath addClip];
     
-    [p fill];
-    [p addClip];
-    
-    [self.shadowColor setFill];
-    
-    CGFloat radian = _angel / 180 * M_PI;
-    CGFloat x,y;
-    if (fabs(sin(radian)) >= fabs(cos(radian)))
-    {
-        x = cos(radian) * ( 1 / fabs(sin(radian)));
-        y = 1 * ( sin(radian) < 0 ? -1 : 1 );
-    } else {
-        x = 1 * ( cos(radian) < 0 ? -1 : 1 );
-        y = sin(radian) * ( 1 / fabs(cos(radian)));
-    }
+    CGFloat radian = _titleShadowAngel / 180 * M_PI;
+    CGFloat xCos = cos(radian);
+    CGFloat ySin = sin(radian);
     
     if (self.currentImage)
     {
-        //Start point
+        // Color
+        [self.currentTitleShadowColor set];
+        // Start point
         CGPoint point = self.imageView.frame.origin;
-        point.x += _shadowXOffset;
-        point.y -= _shadowYOffset;
-        while (true)
+        // Offset
+        point.x += _titleShadowOffsetX;
+        point.y -= _titleShadowOffsetY;
+        // temp length
+        CGFloat length = 0;
+        // Drawing
+        while (length < _titleShadowLength)
         {
-            [self.currentImage drawAtPoint:point];
-            
-            if (CGRectContainsPoint(rect, point) ||
-                CGRectContainsPoint(rect,CGPointMake(point.x + self.currentImage.size.width, point.y + self.currentImage.size.height)) ||
-                CGRectContainsPoint(rect,CGPointMake(point.x + self.currentImage.size.width, point.y)) ||
-                CGRectContainsPoint(rect,CGPointMake(point.x , point.y + self.currentImage.size.height)))
-            {
-                point = CGPointMake(point.x + x, point.y + y);
-            }
-            else
-            {
-                break;
-            }
+            CGFloat x = point.x + length * xCos;
+            CGFloat y = point.y + length * ySin;
+            CGPoint drawPoint = CGPointMake(x, y);
+            [self.currentImage drawAtPoint:drawPoint];
+            length += 0.25;
         }
     } else {
-        NSAttributedString *str = [[NSAttributedString alloc] initWithString:self.currentTitle attributes:@{NSForegroundColorAttributeName: self.shadowColor, NSFontAttributeName: self.titleLabel.font}];
+        NSAttributedString *titleString = self.currentAttributedTitle;
+        NSDictionary *attributes = @{NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: self.titleLabel.font};
+        if (titleString == nil) {
+            titleString = [[NSAttributedString alloc] initWithString:self.currentTitle attributes:attributes];
+        }
         
-        NSAttributedString *attrString = str;
-        CTLineRef line = CTLineCreateWithAttributedString((CFAttributedStringRef)attrString);
-        CFArrayRef runArray = CTLineGetGlyphRuns(line);
+        CTLineRef titleStringLine = CTLineCreateWithAttributedString((CFAttributedStringRef)titleString);
+        NSAttributedString *tokenString = [[NSAttributedString alloc] initWithString:@"\u2026" attributes:attributes];
+        CTLineRef truncationToken = CTLineCreateWithAttributedString((CFAttributedStringRef)tokenString);
+        CTLineTruncationType truncationType = kCTLineTruncationMiddle;
+        CTLineRef titleStringTruncatedLine = CTLineCreateTruncatedLine(titleStringLine, rect.size.width, truncationType, truncationToken);
+        if (titleStringTruncatedLine == nil) {
+            titleStringTruncatedLine = truncationToken;
+        }
+        CFArrayRef runArray = CTLineGetGlyphRuns(titleStringTruncatedLine);
         
         ////////get the cgpath of attributed title////////
         // for each RUN
@@ -165,40 +201,30 @@ static void getPoints(void* info, const CGPathElement* element)
                 CTRunGetPositions(run, thisGlyphRange, &position);
                 
                 // Get PATH of outline
-                {
-                    CGPathRef letter = CTFontCreatePathForGlyph(runFont, glyph, NULL);
-                    CGAffineTransform t = CGAffineTransformMakeTranslation(position.x, position.y);
-                    CGPathAddPath(lettersPath, &t, letter);
-                    CGPathRelease(letter);
-                }
+                CGPathRef letter = CTFontCreatePathForGlyph(runFont, glyph, NULL);
+                CGAffineTransform t = CGAffineTransformMakeTranslation(position.x, position.y);
+                CGPathAddPath(lettersPath, &t, letter);
+                CGPathRelease(letter);
             }
         }
-        CFRelease(line);
-    
-        ///////////////
+        CGPathCloseSubpath(lettersPath);
+        CFRelease(titleStringTruncatedLine);
+        /////////End of "get the cgpath of attributed title"////////
         
-        CGRect stringBoundingRect = [attrString boundingRectWithSize:rect.size
-                                                             options:(NSStringDrawingUsesLineFragmentOrigin |  NSStringDrawingUsesFontLeading)
-                                                             context:nil];// 宽度准确可用
-        CGRect pathBoundingBox = CGPathGetBoundingBox(lettersPath);// 高度准确可用
-        CGRect stringRect = CGRectMake(0, 0, ceil(stringBoundingRect.size.width), ceil(pathBoundingBox.size.height));
-        
+        CGRect stringRect = CGPathGetPathBoundingBox(lettersPath);
         CGAffineTransform transform = CGAffineTransformIdentity;
         transform = CGAffineTransformTranslate(transform, self.titleLabel.center.x - (stringRect.size.width) / 2.0, self.titleLabel.center.y + stringRect.size.height / 2.0f);
         transform = CGAffineTransformScale(transform, 1.0, -1.0);
-        transform = CGAffineTransformTranslate(transform, _shadowXOffset, -_shadowYOffset);
         CGMutablePathRef stringPath = CGPathCreateMutableCopyByTransformingPath(lettersPath, &transform);
+        transform = CGAffineTransformTranslate(transform, _titleShadowOffsetX, -_titleShadowOffsetY);
+        CGMutablePathRef stringPathForShadow = CGPathCreateMutableCopyByTransformingPath(lettersPath, &transform);
         CFRelease(lettersPath);
         
-        CGContextAddPath(ctx, stringPath);
-        CGContextFillPath(ctx);
-        
-        CGFloat l = MAX(rect.size.width, rect.size.height) * 4.0f;
-        
         NSMutableArray *points = [NSMutableArray array];
-        CGPathApply(stringPath, (void *)(points), getPoints);
+        CGPathApply(stringPathForShadow, (void *)(points), getPoints);
+        CFRelease(stringPathForShadow);
         
-        CFRelease(stringPath);
+        [self.currentTitleShadowColor set];
         
         CGPoint currentPoint;
         for (NSArray *pointInfo in points) {
@@ -215,9 +241,9 @@ static void getPoints(void* info, const CGPathElement* element)
                 case kCGPathElementAddLineToPoint:// 1 point
                 {
                     CGPoint point0 = currentPoint;
-                    CGPoint point0_ = CGPointMake(point0.x + l * x, point0.y + l * y);
+                    CGPoint point0_ = CGPointMake(point0.x + _titleShadowLength * xCos, point0.y + _titleShadowLength * ySin);
                     CGPoint point1 = ((NSValue *)allPoints[0]).CGPointValue;
-                    CGPoint point1_ = CGPointMake(point1.x + l * x, point1.y + l * y);
+                    CGPoint point1_ = CGPointMake(point1.x + _titleShadowLength * xCos, point1.y + _titleShadowLength * ySin);
                     
                     CGMutablePathRef stringSubpath = CGPathCreateMutable();
                     CGPathMoveToPoint(stringSubpath, NULL, point0.x, point0.y);
@@ -236,11 +262,11 @@ static void getPoints(void* info, const CGPathElement* element)
                 case kCGPathElementAddQuadCurveToPoint:// 2 points
                 {
                     
-                    CGPoint currentPoint_ = CGPointMake(currentPoint.x + l * x, currentPoint.y + l * y);
+                    CGPoint currentPoint_ = CGPointMake(currentPoint.x + _titleShadowLength * xCos, currentPoint.y + _titleShadowLength * ySin);
                     CGPoint controlPoint0 = ((NSValue *)allPoints[0]).CGPointValue;
-                    CGPoint controlPoint0_ = CGPointMake(controlPoint0.x + l * x, controlPoint0.y + l * y);
+                    CGPoint controlPoint0_ = CGPointMake(controlPoint0.x + _titleShadowLength * xCos, controlPoint0.y + _titleShadowLength * ySin);
                     CGPoint quadCurveEndPoint = ((NSValue *)allPoints[1]).CGPointValue;
-                    CGPoint quadCurveEndPoint_ = CGPointMake(quadCurveEndPoint.x + l * x, quadCurveEndPoint.y + l * y);
+                    CGPoint quadCurveEndPoint_ = CGPointMake(quadCurveEndPoint.x + _titleShadowLength * xCos, quadCurveEndPoint.y + _titleShadowLength * ySin);
                     
                     CGMutablePathRef stringSubpath = CGPathCreateMutable();
                     CGPathMoveToPoint(stringSubpath, NULL, currentPoint.x, currentPoint.y);
@@ -258,13 +284,13 @@ static void getPoints(void* info, const CGPathElement* element)
                     break;
                 case kCGPathElementAddCurveToPoint:// 3 points
                 {
-                    CGPoint currentPoint_ = CGPointMake(currentPoint.x + l * x, currentPoint.y + l * y);
+                    CGPoint currentPoint_ = CGPointMake(currentPoint.x + _titleShadowLength * xCos, currentPoint.y + _titleShadowLength * ySin);
                     CGPoint controlPoint0 = ((NSValue *)allPoints[0]).CGPointValue;
-                    CGPoint controlPoint0_ = CGPointMake(controlPoint0.x + l * x, controlPoint0.y + l * y);
+                    CGPoint controlPoint0_ = CGPointMake(controlPoint0.x + _titleShadowLength * xCos, controlPoint0.y + _titleShadowLength * ySin);
                     CGPoint controlPoint1 = ((NSValue *)allPoints[1]).CGPointValue;
-                    CGPoint controlPoint1_ = CGPointMake(controlPoint1.x + l * x, controlPoint1.y + l * y);
+                    CGPoint controlPoint1_ = CGPointMake(controlPoint1.x + _titleShadowLength * xCos, controlPoint1.y + _titleShadowLength * ySin);
                     CGPoint curveEndPoint = ((NSValue *)allPoints[2]).CGPointValue;
-                    CGPoint curveEndPoint_ = CGPointMake(curveEndPoint.x + l * x, curveEndPoint.y + l * y);
+                    CGPoint curveEndPoint_ = CGPointMake(curveEndPoint.x + _titleShadowLength * xCos, curveEndPoint.y + _titleShadowLength * ySin);
                     
                     CGMutablePathRef stringSubpath = CGPathCreateMutable();
                     CGPathMoveToPoint(stringSubpath, NULL, currentPoint.x, currentPoint.y);
@@ -289,6 +315,10 @@ static void getPoints(void* info, const CGPathElement* element)
                     break;
             }
         }
+        [self.currentTitleColor set];
+        [[UIBezierPath bezierPathWithCGPath:stringPath] fill];
+        self.titleLabel.alpha = 0.0f;
+        CFRelease(stringPath);
     }
 }
 

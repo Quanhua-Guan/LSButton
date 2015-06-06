@@ -10,20 +10,18 @@
 IB_DESIGNABLE
 @interface LSButton : UIButton
 
-@property (nonatomic,strong) IBInspectable UIColor *buttonColor;
-@property (nonatomic,strong) IBInspectable UIColor *shadowColor;
-@property (nonatomic) IBInspectable CGFloat shadowXOffset;
-@property (nonatomic) IBInspectable CGFloat shadowYOffset;
-@property (nonatomic) IBInspectable CGFloat radius;
-@property (nonatomic) IBInspectable CGFloat angel;
+@property (nonatomic) IBInspectable CGFloat titleShadowOffsetX;
+@property (nonatomic) IBInspectable CGFloat titleShadowOffsetY;
+@property (nonatomic) IBInspectable CGFloat titleShadowLength;
+@property (nonatomic) IBInspectable CGFloat titleShadowAngel;
 
 + (LSButton *)buttonWithFrame:(CGRect)frame
                          icon:(UIImage*)icon
                   buttonColor:(UIColor*)buttonColor
-                  shadowColor:(UIColor*)shadowColor
+             titleShadowColor:(UIColor*)titleShadowColor
                     tintColor:(UIColor*)tintColor
                        radius:(CGFloat)radius
-                        angel:(CGFloat)angel
+                        titleShadowAngel:(CGFloat)titleShadowAngel
                       target:(id)tar
                       action:(SEL)sel;
 @end

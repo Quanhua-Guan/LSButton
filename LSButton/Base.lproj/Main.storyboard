@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -16,54 +17,94 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lRb-dk-3Gi" customClass="LSButton">
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="30" minValue="0.0" maxValue="1080" translatesAutoresizingMaskIntoConstraints="NO" id="Mon-sO-eJ1">
+                                <rect key="frame" x="28" y="448" width="544" height="31"/>
+                                <connections>
+                                    <action selector="valueDidChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="vhZ-QZ-QPT"/>
+                                </connections>
+                            </slider>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="aRV-Mh-Agf">
+                                <rect key="frame" x="28" y="486" width="544" height="31"/>
+                                <connections>
+                                    <action selector="backgroundColorValueDidChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="2cu-ev-IdM"/>
+                                </connections>
+                            </slider>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="2J2-3U-YhW">
+                                <rect key="frame" x="28" y="524" width="544" height="31"/>
+                                <connections>
+                                    <action selector="titleColorValueDidChanged2:" destination="vXZ-lx-hvc" eventType="valueChanged" id="avo-k8-fIs"/>
+                                </connections>
+                            </slider>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="AgJ-Uv-UYx">
+                                <rect key="frame" x="28" y="562" width="544" height="31"/>
+                                <connections>
+                                    <action selector="titleShadowColorValueDidChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="S2u-1V-8tJ"/>
+                                </connections>
+                            </slider>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lRb-dk-3Gi" customClass="LSButton">
                                 <rect key="frame" x="226" y="225" width="150" height="150"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="0.99607849120000003" green="0.86666673419999996" blue="0.88627457620000005" alpha="1" colorSpace="deviceRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="150" id="SdF-3C-Ntq"/>
                                     <constraint firstAttribute="width" constant="150" id="aTr-dK-gxT"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name="Verdana-Bold" family="Verdana" pointSize="20"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <size key="titleShadowOffset" width="0.29999999999999999" height="0.0"/>
-                                <state key="normal" title="Smile">
+                                <state key="normal" title="Smile happy">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" red="0.031372550870000002" green="0.80000007149999997" blue="0.99215692280000001" alpha="0.45000000000000001" colorSpace="deviceRGB"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="radius">
                                         <real key="value" value="30"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="buttonColor">
-                                        <color key="value" red="0.68235296010000002" green="0.85490202900000001" blue="0.85098046059999999" alpha="1" colorSpace="deviceRGB"/>
+                                    <userDefinedRuntimeAttribute type="color" keyPath="titleShadowColor">
+                                        <color key="value" red="0.070588238537311554" green="0.84313732385635376" blue="0.9647059440612793" alpha="0.53000000000000003" colorSpace="deviceRGB"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
-                                        <color key="value" red="0.96078437569999997" green="0.41176474089999998" blue="0.5176470876" alpha="0.71999999999999997" colorSpace="deviceRGB"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="angel">
+                                    <userDefinedRuntimeAttribute type="number" keyPath="titleShadowAngel">
                                         <real key="value" value="45"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowXOffset">
+                                    <userDefinedRuntimeAttribute type="number" keyPath="titleShadowOffsetX">
                                         <real key="value" value="0.0"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowYOffset">
+                                    <userDefinedRuntimeAttribute type="number" keyPath="titleShadowOffsetY">
                                         <real key="value" value="0.0"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="10"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="titleShadowLength">
+                                        <real key="value" value="30"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </button>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="30" minValue="0.0" maxValue="360" translatesAutoresizingMaskIntoConstraints="NO" id="Mon-sO-eJ1">
-                                <rect key="frame" x="28" y="406" width="544" height="31"/>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="30" minValue="0.0" maxValue="360" translatesAutoresizingMaskIntoConstraints="NO" id="gG8-Rq-fQY">
+                                <rect key="frame" x="28" y="410" width="544" height="31"/>
                                 <connections>
-                                    <action selector="valueDidChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="vhZ-QZ-QPT"/>
+                                    <action selector="titleShadowLengthValueDidChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="ppC-hy-4ly"/>
                                 </connections>
                             </slider>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="2J2-3U-YhW" secondAttribute="trailing" constant="14" id="4Ba-Ej-5T6"/>
                             <constraint firstAttribute="trailing" secondItem="Mon-sO-eJ1" secondAttribute="trailing" constant="30" id="59C-o8-SL5"/>
-                            <constraint firstItem="Mon-sO-eJ1" firstAttribute="top" secondItem="lRb-dk-3Gi" secondAttribute="bottom" constant="31" id="H3N-PB-k1c"/>
+                            <constraint firstItem="2J2-3U-YhW" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="14" id="IeE-hz-4n8"/>
                             <constraint firstItem="Mon-sO-eJ1" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" constant="30" id="NYi-DG-nQc"/>
                             <constraint firstAttribute="centerY" secondItem="lRb-dk-3Gi" secondAttribute="centerY" id="PEw-Qe-2G6"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="AgJ-Uv-UYx" secondAttribute="trailing" constant="14" id="SQ8-Fj-bu3"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="gG8-Rq-fQY" secondAttribute="trailing" constant="14" id="Xs2-hi-kSL"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="AgJ-Uv-UYx" secondAttribute="bottom" constant="8" id="Z6A-BL-e7v"/>
+                            <constraint firstItem="aRV-Mh-Agf" firstAttribute="top" secondItem="Mon-sO-eJ1" secondAttribute="bottom" constant="8" id="ffc-Py-3cV"/>
                             <constraint firstAttribute="centerX" secondItem="lRb-dk-3Gi" secondAttribute="centerX" constant="-0.5" id="hVe-TC-GhG"/>
+                            <constraint firstItem="2J2-3U-YhW" firstAttribute="top" secondItem="aRV-Mh-Agf" secondAttribute="bottom" constant="8" id="laF-aT-quJ"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="aRV-Mh-Agf" secondAttribute="trailing" constant="14" id="mLg-dr-Aa1"/>
+                            <constraint firstItem="AgJ-Uv-UYx" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="14" id="qyJ-MX-i0U"/>
+                            <constraint firstItem="gG8-Rq-fQY" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="14" id="r60-yX-Rzy"/>
+                            <constraint firstItem="Mon-sO-eJ1" firstAttribute="top" secondItem="gG8-Rq-fQY" secondAttribute="bottom" constant="8" id="tRe-1M-3iq"/>
+                            <constraint firstItem="AgJ-Uv-UYx" firstAttribute="top" secondItem="2J2-3U-YhW" secondAttribute="bottom" constant="8" id="w3u-ei-o69"/>
+                            <constraint firstItem="aRV-Mh-Agf" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="14" id="wkf-Wa-BRR"/>
                         </constraints>
                     </view>
                     <connections>
@@ -72,7 +113,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="397" y="380"/>
+            <point key="canvasLocation" x="565" y="464"/>
         </scene>
     </scenes>
 </document>
