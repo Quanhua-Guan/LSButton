@@ -13,7 +13,7 @@
                         <viewControllerLayoutGuide type="top" id="jyV-Pf-zRb"/>
                         <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
+                    <view key="view" alpha="0.94999999999999996" contentMode="scaleToFill" id="kh9-bI-dsS">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
@@ -41,27 +41,39 @@
                                     <action selector="titleShadowColorValueDidChanged:" destination="vXZ-lx-hvc" eventType="valueChanged" id="S2u-1V-8tJ"/>
                                 </connections>
                             </slider>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lRb-dk-3Gi" customClass="LSButton">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lRb-dk-3Gi" customClass="LSButton">
                                 <rect key="frame" x="226" y="225" width="150" height="150"/>
                                 <color key="backgroundColor" red="0.99607849120000003" green="0.86666673419999996" blue="0.88627457620000005" alpha="1" colorSpace="deviceRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="150" id="SdF-3C-Ntq"/>
                                     <constraint firstAttribute="width" constant="150" id="aTr-dK-gxT"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <size key="titleShadowOffset" width="0.29999999999999999" height="0.0"/>
-                                <state key="normal" title="Smile happy">
-                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                    <color key="titleShadowColor" red="0.031372550870000002" green="0.80000007149999997" blue="0.99215692280000001" alpha="0.45000000000000001" colorSpace="deviceRGB"/>
+                                <state key="normal" image="icon">
+                                    <attributedString key="attributedTitle">
+                                        <fragment content="Sm">
+                                            <attributes>
+                                                <color key="NSColor" red="1" green="0.73250000000000004" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <font key="NSFont" size="26" name="HelveticaNeue"/>
+                                            </attributes>
+                                        </fragment>
+                                        <fragment content="ile 012345678910 ">
+                                            <attributes>
+                                                <color key="NSColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <font key="NSFont" size="26" name="HelveticaNeue"/>
+                                            </attributes>
+                                        </fragment>
+                                        <fragment content="happy">
+                                            <attributes>
+                                                <color key="NSBackgroundColor" red="1" green="0.91125" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <color key="NSColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                <font key="NSFont" size="26" name="HelveticaNeue"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
                                 </state>
                                 <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="radius">
-                                        <real key="value" value="30"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="titleShadowColor">
-                                        <color key="value" red="0.070588238537311554" green="0.84313732385635376" blue="0.9647059440612793" alpha="0.53000000000000003" colorSpace="deviceRGB"/>
-                                    </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="titleShadowAngel">
                                         <real key="value" value="45"/>
                                     </userDefinedRuntimeAttribute>
@@ -71,11 +83,11 @@
                                     <userDefinedRuntimeAttribute type="number" keyPath="titleShadowOffsetY">
                                         <real key="value" value="0.0"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                        <integer key="value" value="10"/>
-                                    </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="number" keyPath="titleShadowLength">
                                         <real key="value" value="30"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="20"/>
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                             </button>
@@ -86,7 +98,7 @@
                                 </connections>
                             </slider>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailingMargin" secondItem="2J2-3U-YhW" secondAttribute="trailing" constant="14" id="4Ba-Ej-5T6"/>
                             <constraint firstAttribute="trailing" secondItem="Mon-sO-eJ1" secondAttribute="trailing" constant="30" id="59C-o8-SL5"/>
@@ -113,7 +125,10 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="565" y="464"/>
+            <point key="canvasLocation" x="238" y="333"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="icon" width="40" height="40"/>
+    </resources>
 </document>

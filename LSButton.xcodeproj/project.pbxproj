@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		27C6F6F11B23E46F0048C566 /* UIImage+Tint.m in Sources */ = {isa = PBXBuildFile; fileRef = 27C6F6F01B23E46F0048C566 /* UIImage+Tint.m */; };
 		2FEA75D81A68DB88003B786D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FEA75D71A68DB88003B786D /* main.m */; };
 		2FEA75DB1A68DB88003B786D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FEA75DA1A68DB88003B786D /* AppDelegate.m */; };
 		2FEA75DE1A68DB88003B786D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FEA75DD1A68DB88003B786D /* ViewController.m */; };
@@ -28,6 +29,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		27C6F6EF1B23E46F0048C566 /* UIImage+Tint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Tint.h"; sourceTree = "<group>"; };
+		27C6F6F01B23E46F0048C566 /* UIImage+Tint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Tint.m"; sourceTree = "<group>"; };
 		2FEA75D21A68DB88003B786D /* LSButton.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LSButton.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FEA75D61A68DB88003B786D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2FEA75D71A68DB88003B786D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -63,6 +66,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		27C6F6F21B23E6B40048C566 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				2FEA75FB1A68DBC9003B786D /* LSButton.h */,
+				2FEA75FC1A68DBC9003B786D /* LSButton.m */,
+				27C6F6EF1B23E46F0048C566 /* UIImage+Tint.h */,
+				27C6F6F01B23E46F0048C566 /* UIImage+Tint.m */,
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
 		2FEA75C91A68DB88003B786D = {
 			isa = PBXGroup;
 			children = (
@@ -84,8 +98,7 @@
 		2FEA75D41A68DB88003B786D /* LSButton */ = {
 			isa = PBXGroup;
 			children = (
-				2FEA75FB1A68DBC9003B786D /* LSButton.h */,
-				2FEA75FC1A68DBC9003B786D /* LSButton.m */,
+				27C6F6F21B23E6B40048C566 /* Classes */,
 				2FEA75D91A68DB88003B786D /* AppDelegate.h */,
 				2FEA75DA1A68DB88003B786D /* AppDelegate.m */,
 				2FEA75DC1A68DB88003B786D /* ViewController.h */,
@@ -227,6 +240,7 @@
 			files = (
 				2FEA75FD1A68DBC9003B786D /* LSButton.m in Sources */,
 				2FEA75DE1A68DB88003B786D /* ViewController.m in Sources */,
+				27C6F6F11B23E46F0048C566 /* UIImage+Tint.m in Sources */,
 				2FEA75DB1A68DB88003B786D /* AppDelegate.m in Sources */,
 				2FEA75D81A68DB88003B786D /* main.m in Sources */,
 			);

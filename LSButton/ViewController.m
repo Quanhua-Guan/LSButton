@@ -19,7 +19,7 @@
 {
     if (!buttonFromCode)
     {
-        buttonFromCode = [LSButton buttonWithFrame:CGRectOffset(button.frame, 0, -button.frame.size.height - 10) icon:[UIImage imageNamed:@"icon"] buttonColor:[UIColor grayColor] titleShadowColor:[UIColor blackColor] tintColor:[UIColor whiteColor] radius:20 titleShadowAngel:45 target:nil action:nil];
+        buttonFromCode = [LSButton buttonWithFrame:CGRectOffset(button.frame, 0, -button.frame.size.height - 10) icon:[UIImage imageNamed:@"icon"] buttonColor:[UIColor colorWithRed:0.923 green:0.924 blue:0.879 alpha:1.000] titleShadowColor:[UIColor colorWithRed:0.729 green:0.366 blue:0.977 alpha:1.000] tintColor:[UIColor whiteColor] radius:20 titleShadowAngel:45 target:nil action:nil];
         [self.view addSubview:buttonFromCode];
     }
     [button setTitleColor:[UIColor colorWithRed:0.986 green:0.000 blue:0.173 alpha:0.510] forState:UIControlStateHighlighted];
@@ -61,6 +61,7 @@
     [titleShadowColor getRed:&r green:&g blue:&b alpha:&a];
     UIColor *color =[UIColor colorWithRed:realR green:g blue:b alpha:a];
     [button setTitleShadowColor:color forState:UIControlStateNormal];
+    [buttonFromCode setTitleShadowColor:color forState:UIControlStateNormal];
 }
 
 - (IBAction)titleShadowLengthValueDidChanged:(UISlider *)sender {

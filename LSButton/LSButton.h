@@ -14,6 +14,8 @@ IB_DESIGNABLE
 @property (nonatomic) IBInspectable CGFloat titleShadowOffsetY;
 @property (nonatomic) IBInspectable CGFloat titleShadowLength;
 @property (nonatomic) IBInspectable CGFloat titleShadowAngel;
+@property (nonatomic) IBInspectable BOOL hideTitleStringShadow;
+@property (nonatomic) IBInspectable BOOL hideTitleImageShadow;
 
 + (LSButton *)buttonWithFrame:(CGRect)frame
                          icon:(UIImage*)icon

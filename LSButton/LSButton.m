@@ -8,6 +8,7 @@
 
 #import "LSButton.h"
 #import <CoreText/CoreText.h>
+#import "UIImage+Tint.h"
 
 static void getPoints(void* info, const CGPathElement* element)
 {
@@ -44,6 +45,7 @@ static void getPoints(void* info, const CGPathElement* element)
 
 @implementation LSButton {
     UIColor *realBGColor;
+    UIImage *currentShadowImage;
 }
 
 +(LSButton *)buttonWithFrame:(CGRect)frame icon:(UIImage*)icon buttonColor:(UIColor *)buttonColor titleShadowColor:(UIColor *)titleShadowColor tintColor:(UIColor*)tintColor radius:(CGFloat)radius titleShadowAngel:(CGFloat)titleShadowAngel target:(id)tar action:(SEL)sel
@@ -62,6 +64,14 @@ static void getPoints(void* info, const CGPathElement* element)
 
 - (instancetype)init {
     return [self initWithFrame:CGRectZero];
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    if (self = [super initWithCoder:aDecoder]) {
+        [self setup];
+    }
+    return self;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -83,11 +93,17 @@ static void getPoints(void* info, const CGPathElement* element)
         _titleShadowLength = 100;
     }
     if (!self.titleShadowAngel) self.titleShadowAngel = 45;
+    
+    self.layer.masksToBounds = YES;
 }
+
+#pragma mark - Getters
 
 - (UIColor *)backgroundColor {
     return realBGColor;
 }
+
+#pragma mark - Setters
 
 - (void)setHighlighted:(BOOL)highlighted {
     [super setHighlighted:highlighted];
@@ -117,34 +133,59 @@ static void getPoints(void* info, const CGPathElement* element)
 
 - (void)setTitleShadowColor:(UIColor *)color forState:(UIControlState)state {
     [super setTitleShadowColor:color forState:state];
+    currentShadowImage = nil;
+    currentShadowImage = [self.currentImage imageWithTintColor:self.currentTitleShadowColor];
     [self setNeedsDisplay];
 }
+
+- (void)setImage:(UIImage *)image forState:(UIControlState)state {
+    [super setImage:image forState:state];
+    currentShadowImage = nil;
+    currentShadowImage = [self.currentImage imageWithTintColor:self.currentTitleShadowColor];
+    [self setNeedsDisplay];
+}
+
+- (void)setHideTitleImageShadow:(BOOL)hideTitleImageShadow {
+    _hideTitleImageShadow = hideTitleImageShadow;
+    [self setNeedsDisplay];
+}
+
+- (void)setHideTitleStringShadow:(BOOL)hideTitleStringShadow {
+    _hideTitleStringShadow = hideTitleStringShadow;
+    [self setNeedsDisplay];
+}
+
+#pragma mark - Others
 
 -(void)layoutSubviews
 {
     [super layoutSubviews];
     //Set image always tint
-    if (self.currentImage) [self setImage:[self.currentImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    if (self.currentImage) {
+        if (self.currentImage) [self setImage:[self.currentImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    }
+    //
+    if (!self.currentTitleShadowColor) {
+        [self setTitleShadowColor:[UIColor grayColor] forState:UIControlStateNormal];
+    }
 }
 
 - (void)drawRect:(CGRect)rect
 {
-    [super drawRect:rect];
-    
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     CGContextSetAllowsAntialiasing(ctx, YES);
     
     // background color
     [realBGColor set];
-    UIBezierPath *buttonBezierPath = [UIBezierPath bezierPathWithRoundedRect:rect cornerRadius:self.layer.cornerRadius];
+    UIBezierPath *buttonBezierPath = [UIBezierPath bezierPathWithRect:rect];
     [buttonBezierPath fill];
-    [buttonBezierPath addClip];
     
     CGFloat radian = _titleShadowAngel / 180 * M_PI;
     CGFloat xCos = cos(radian);
     CGFloat ySin = sin(radian);
     
-    if (self.currentImage)
+    // Title Image Shadow -> UIiButton.currentImage
+    if (!_hideTitleImageShadow && self.currentImage)
     {
         // Color
         [self.currentTitleShadowColor set];
@@ -154,28 +195,57 @@ static void getPoints(void* info, const CGPathElement* element)
         point.x += _titleShadowOffsetX;
         point.y -= _titleShadowOffsetY;
         // temp length
-        CGFloat length = 0;
+        CGFloat length = 1;
+        // get shadow image
+        CGContextSaveGState(ctx);
+        if (currentShadowImage == nil) {
+            currentShadowImage = [self.currentImage imageWithTintColor:self.currentTitleShadowColor];
+        }
+        UIImage *shadowImage = currentShadowImage;
+        CGContextRestoreGState(ctx);
         // Drawing
         while (length < _titleShadowLength)
         {
             CGFloat x = point.x + length * xCos;
             CGFloat y = point.y + length * ySin;
             CGPoint drawPoint = CGPointMake(x, y);
-            [self.currentImage drawAtPoint:drawPoint];
+            [shadowImage drawAtPoint:drawPoint];
             length += 0.25;
         }
-    } else {
+    }
+    
+    // Title String Shadow -> UIButton.currentTitle
+    if (self.currentTitle || self.currentAttributedTitle) {
         NSAttributedString *titleString = self.currentAttributedTitle;
         NSDictionary *attributes = @{NSForegroundColorAttributeName: [UIColor blackColor], NSFontAttributeName: self.titleLabel.font};
         if (titleString == nil) {
             titleString = [[NSAttributedString alloc] initWithString:self.currentTitle attributes:attributes];
         }
         
+        NSString *tokenString = @"\u2026";
         CTLineRef titleStringLine = CTLineCreateWithAttributedString((CFAttributedStringRef)titleString);
-        NSAttributedString *tokenString = [[NSAttributedString alloc] initWithString:@"\u2026" attributes:attributes];
-        CTLineRef truncationToken = CTLineCreateWithAttributedString((CFAttributedStringRef)tokenString);
-        CTLineTruncationType truncationType = kCTLineTruncationMiddle;
-        CTLineRef titleStringTruncatedLine = CTLineCreateTruncatedLine(titleStringLine, rect.size.width, truncationType, truncationToken);
+        CTLineTruncationType truncationType = kCTLineTruncationEnd;
+        switch (self.titleLabel.lineBreakMode) {
+            case NSLineBreakByWordWrapping:
+            case NSLineBreakByCharWrapping:
+            case NSLineBreakByClipping:
+                tokenString = @"";
+                break;
+            case  NSLineBreakByTruncatingTail:
+                truncationType = kCTLineTruncationEnd;
+                break;
+            case  NSLineBreakByTruncatingHead:
+                truncationType = kCTLineTruncationStart;
+                break;
+            case  NSLineBreakByTruncatingMiddle:
+                truncationType = kCTLineTruncationMiddle;
+                break;
+            default:
+                break;
+        }
+        NSAttributedString *attributedTokenString = [[NSAttributedString alloc] initWithString:tokenString attributes:attributes];
+        CTLineRef truncationToken = CTLineCreateWithAttributedString((CFAttributedStringRef)attributedTokenString);
+        CTLineRef titleStringTruncatedLine = CTLineCreateTruncatedLine(titleStringLine, self.titleLabel.bounds.size.width, truncationType, truncationToken);
         if (titleStringTruncatedLine == nil) {
             titleStringTruncatedLine = truncationToken;
         }
@@ -224,102 +294,102 @@ static void getPoints(void* info, const CGPathElement* element)
         CGPathApply(stringPathForShadow, (void *)(points), getPoints);
         CFRelease(stringPathForShadow);
         
-        [self.currentTitleShadowColor set];
+        if (!_hideTitleStringShadow) {
+            [self.currentTitleShadowColor set];
+            CGPoint currentPoint;
+            for (NSArray *pointInfo in points) {
+                NSInteger type = ((NSNumber *)pointInfo[0]).integerValue;
+                NSArray *allPoints = pointInfo[1];
+                switch (type)
+                {
+                    case kCGPathElementMoveToPoint:// 1 point
+                    {
+                        CGPoint point = ((NSValue *)allPoints[0]).CGPointValue;
+                        currentPoint = point;
+                    }
+                        break;
+                    case kCGPathElementAddLineToPoint:// 1 point
+                    {
+                        CGPoint startPoint = currentPoint;
+                        CGPoint startPoint_ = CGPointMake(startPoint.x + _titleShadowLength * xCos, startPoint.y + _titleShadowLength * ySin);
+                        CGPoint endPoint = ((NSValue *)allPoints[0]).CGPointValue;
+                        CGPoint endPoint_ = CGPointMake(endPoint.x + _titleShadowLength * xCos, endPoint.y + _titleShadowLength * ySin);
+                        
+                        CGMutablePathRef stringSubpath = CGPathCreateMutable();
+                        CGPathMoveToPoint(stringSubpath, NULL, startPoint.x, startPoint.y);
+                        CGPathAddLineToPoint(stringSubpath, NULL, startPoint_.x, startPoint_.y);
+                        CGPathAddLineToPoint(stringSubpath, NULL, endPoint_.x, endPoint_.y);
+                        CGPathAddLineToPoint(stringSubpath, NULL, endPoint.x, endPoint.y);
+                        CGPathCloseSubpath(stringSubpath);
+                        CGContextAddPath(ctx, stringSubpath);
+                        CGContextFillPath(ctx);
+                        
+                        CFRelease(stringSubpath);
+                        currentPoint = endPoint;
+                    }
+                        break;
+                    case kCGPathElementAddQuadCurveToPoint:// 2 points
+                    {
+                        CGPoint currentPoint_ = CGPointMake(currentPoint.x + _titleShadowLength * xCos, currentPoint.y + _titleShadowLength * ySin);
+                        CGPoint controlPoint0 = ((NSValue *)allPoints[0]).CGPointValue;
+                        CGPoint controlPoint0_ = CGPointMake(controlPoint0.x + _titleShadowLength * xCos, controlPoint0.y + _titleShadowLength * ySin);
+                        CGPoint quadCurveEndPoint = ((NSValue *)allPoints[1]).CGPointValue;
+                        CGPoint quadCurveEndPoint_ = CGPointMake(quadCurveEndPoint.x + _titleShadowLength * xCos, quadCurveEndPoint.y + _titleShadowLength * ySin);
+                        
+                        CGMutablePathRef stringSubpath = CGPathCreateMutable();
+                        CGPathMoveToPoint(stringSubpath, NULL, currentPoint.x, currentPoint.y);
+                        CGPathAddQuadCurveToPoint(stringSubpath, NULL, controlPoint0.x, controlPoint0.y, quadCurveEndPoint.x, quadCurveEndPoint.y);
+                        CGPathAddLineToPoint(stringSubpath, NULL, quadCurveEndPoint_.x, quadCurveEndPoint_.y);
+                        CGPathAddQuadCurveToPoint(stringSubpath, NULL, controlPoint0_.x, controlPoint0_.y, currentPoint_.x, currentPoint_.y);
+                        CGPathCloseSubpath(stringSubpath);
+                        CGContextAddPath(ctx, stringSubpath);
+                        CGContextFillPath(ctx);
+                        
+                        CFRelease(stringSubpath);
+                        currentPoint = quadCurveEndPoint;
+                    }
+                        break;
+                    case kCGPathElementAddCurveToPoint:// 3 points
+                    {
+                        CGPoint currentPoint_ = CGPointMake(currentPoint.x + _titleShadowLength * xCos, currentPoint.y + _titleShadowLength * ySin);
+                        CGPoint controlPoint0 = ((NSValue *)allPoints[0]).CGPointValue;
+                        CGPoint controlPoint0_ = CGPointMake(controlPoint0.x + _titleShadowLength * xCos, controlPoint0.y + _titleShadowLength * ySin);
+                        CGPoint controlPoint1 = ((NSValue *)allPoints[1]).CGPointValue;
+                        CGPoint controlPoint1_ = CGPointMake(controlPoint1.x + _titleShadowLength * xCos, controlPoint1.y + _titleShadowLength * ySin);
+                        CGPoint curveEndPoint = ((NSValue *)allPoints[2]).CGPointValue;
+                        CGPoint curveEndPoint_ = CGPointMake(curveEndPoint.x + _titleShadowLength * xCos, curveEndPoint.y + _titleShadowLength * ySin);
+                        
+                        CGMutablePathRef stringSubpath = CGPathCreateMutable();
+                        CGPathMoveToPoint(stringSubpath, NULL, currentPoint.x, currentPoint.y);
+                        CGPathAddCurveToPoint(stringSubpath, NULL, controlPoint0.x, controlPoint0.y, controlPoint1.x, controlPoint1.y, curveEndPoint.x, curveEndPoint.y);
+                        CGPathAddLineToPoint(stringSubpath, NULL, curveEndPoint_.x, curveEndPoint_.y);
+                        CGPathAddCurveToPoint(stringSubpath, NULL, controlPoint1_.x, controlPoint1_.y, controlPoint0_.x, controlPoint0_.y, currentPoint_.x, currentPoint_.y);
+                        CGPathCloseSubpath(stringSubpath);
+                        CGContextAddPath(ctx, stringSubpath);
+                        CGContextFillPath(ctx);
+                        
+                        CFRelease(stringSubpath);
+                        currentPoint = curveEndPoint;
+                    }
+                        break;
+                    case kCGPathElementCloseSubpath:// 0 point
+                    {
+                        // do nothing
+                    }
+                        break;
+                    default:
+                        break;
+                }// end of switch
+            }// end of for
+        }// end of if
         
-        CGPoint currentPoint;
-        for (NSArray *pointInfo in points) {
-            NSInteger type = ((NSNumber *)pointInfo[0]).integerValue;
-            NSArray *allPoints = pointInfo[1];
-            switch (type)
-            {
-                case kCGPathElementMoveToPoint:// 1 point
-                {
-                    CGPoint point = ((NSValue *)allPoints[0]).CGPointValue;
-                    currentPoint = point;
-                }
-                    break;
-                case kCGPathElementAddLineToPoint:// 1 point
-                {
-                    CGPoint point0 = currentPoint;
-                    CGPoint point0_ = CGPointMake(point0.x + _titleShadowLength * xCos, point0.y + _titleShadowLength * ySin);
-                    CGPoint point1 = ((NSValue *)allPoints[0]).CGPointValue;
-                    CGPoint point1_ = CGPointMake(point1.x + _titleShadowLength * xCos, point1.y + _titleShadowLength * ySin);
-                    
-                    CGMutablePathRef stringSubpath = CGPathCreateMutable();
-                    CGPathMoveToPoint(stringSubpath, NULL, point0.x, point0.y);
-                    CGPathAddLineToPoint(stringSubpath, NULL, point0_.x, point0_.y);
-                    CGPathAddLineToPoint(stringSubpath, NULL, point1_.x, point1_.y);
-                    CGPathAddLineToPoint(stringSubpath, NULL, point1.x, point1.y);
-                    CGPathCloseSubpath(stringSubpath);
-                    CGContextAddPath(ctx, stringSubpath);
-                    CGContextFillPath(ctx);
-                    
-                    CFRelease(stringSubpath);
-                    
-                    currentPoint = point1;
-                }
-                    break;
-                case kCGPathElementAddQuadCurveToPoint:// 2 points
-                {
-                    
-                    CGPoint currentPoint_ = CGPointMake(currentPoint.x + _titleShadowLength * xCos, currentPoint.y + _titleShadowLength * ySin);
-                    CGPoint controlPoint0 = ((NSValue *)allPoints[0]).CGPointValue;
-                    CGPoint controlPoint0_ = CGPointMake(controlPoint0.x + _titleShadowLength * xCos, controlPoint0.y + _titleShadowLength * ySin);
-                    CGPoint quadCurveEndPoint = ((NSValue *)allPoints[1]).CGPointValue;
-                    CGPoint quadCurveEndPoint_ = CGPointMake(quadCurveEndPoint.x + _titleShadowLength * xCos, quadCurveEndPoint.y + _titleShadowLength * ySin);
-                    
-                    CGMutablePathRef stringSubpath = CGPathCreateMutable();
-                    CGPathMoveToPoint(stringSubpath, NULL, currentPoint.x, currentPoint.y);
-                    CGPathAddQuadCurveToPoint(stringSubpath, NULL, controlPoint0.x, controlPoint0.y, quadCurveEndPoint.x, quadCurveEndPoint.y);
-                    CGPathAddLineToPoint(stringSubpath, NULL, quadCurveEndPoint_.x, quadCurveEndPoint_.y);
-                    CGPathAddQuadCurveToPoint(stringSubpath, NULL, controlPoint0_.x, controlPoint0_.y, currentPoint_.x, currentPoint_.y);
-                    CGPathCloseSubpath(stringSubpath);
-                    CGContextAddPath(ctx, stringSubpath);
-                    CGContextFillPath(ctx);
-                    
-                    CFRelease(stringSubpath);
-                    
-                    currentPoint = quadCurveEndPoint;
-                }
-                    break;
-                case kCGPathElementAddCurveToPoint:// 3 points
-                {
-                    CGPoint currentPoint_ = CGPointMake(currentPoint.x + _titleShadowLength * xCos, currentPoint.y + _titleShadowLength * ySin);
-                    CGPoint controlPoint0 = ((NSValue *)allPoints[0]).CGPointValue;
-                    CGPoint controlPoint0_ = CGPointMake(controlPoint0.x + _titleShadowLength * xCos, controlPoint0.y + _titleShadowLength * ySin);
-                    CGPoint controlPoint1 = ((NSValue *)allPoints[1]).CGPointValue;
-                    CGPoint controlPoint1_ = CGPointMake(controlPoint1.x + _titleShadowLength * xCos, controlPoint1.y + _titleShadowLength * ySin);
-                    CGPoint curveEndPoint = ((NSValue *)allPoints[2]).CGPointValue;
-                    CGPoint curveEndPoint_ = CGPointMake(curveEndPoint.x + _titleShadowLength * xCos, curveEndPoint.y + _titleShadowLength * ySin);
-                    
-                    CGMutablePathRef stringSubpath = CGPathCreateMutable();
-                    CGPathMoveToPoint(stringSubpath, NULL, currentPoint.x, currentPoint.y);
-                    CGPathAddCurveToPoint(stringSubpath, NULL, controlPoint0.x, controlPoint0.y, controlPoint1.x, controlPoint1.y, curveEndPoint.x, curveEndPoint.y);
-                    CGPathAddLineToPoint(stringSubpath, NULL, curveEndPoint_.x, curveEndPoint_.y);
-                    CGPathAddCurveToPoint(stringSubpath, NULL, controlPoint1_.x, controlPoint1_.y, controlPoint0_.x, controlPoint0_.y, currentPoint_.x, currentPoint_.y);
-                    CGPathCloseSubpath(stringSubpath);
-                    CGContextAddPath(ctx, stringSubpath);
-                    CGContextFillPath(ctx);
-                    
-                    CFRelease(stringSubpath);
-                    
-                    currentPoint = curveEndPoint;
-                }
-                    break;
-                case kCGPathElementCloseSubpath:// 0 point
-                {
-                    // do nothing
-                }
-                    break;
-                default:
-                    break;
-            }
-        }
+        // draw the title
         [self.currentTitleColor set];
         [[UIBezierPath bezierPathWithCGPath:stringPath] fill];
         self.titleLabel.alpha = 0.0f;
         CFRelease(stringPath);
     }
+    [super drawRect:rect];
 }
 
 @end
